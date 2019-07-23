@@ -13,10 +13,10 @@ queue2 = Queue()
 #global total
 
 def rate(before_tax_salary):
-    if before_tax_salary<min:
-        num_1 = min
-    elif before_tax_salary>max:
-        num_1 = max
+    if before_tax_salary<lowest:
+        num_1 = lowest
+    elif before_tax_salary>highest:
+        num_1 = highest
     else:
         num_1 = before_tax_salary
     shebao_money = num_1*total
@@ -71,29 +71,44 @@ def q3(queue2,gongzifile):
         writer.writerow(newdata)
 
 def main():
-
-    opts,args = getopt.getopt(sys.argv[1:],'hC:c:d:o:',['help'])
+    global total
+    global lowest
+    global highest
+    try:
+        opts,args = getopt.getopt(sys.argv[1:],'hC:c:d:o:',['help'])
+    except GetoptError:
+        print('Parameter Error')
+        exit()
     options = dict(opts)
-    the_city = options['-C'].upper()
+    d = []
+    if len(options)==1 and list(options.keys())[0] in ['-h','--help']:
+        print('Usage:calculator.py -C cityname -c configfile -d userdata -o resultdata')
+        exit()
+    for key in options:
+        d.append(key)
+    if '-C' in d:
+        the_city = options['-C'].upper()
+    else:
+        the_city = 'default'
     configfile = options['-c']
     userfile = options['-d']
     gongzifile = options['-o']
     config = ConfigParser()
-    config.read('test.cfg',encoding='UTF-8')
+    config.read(configfile,encoding='UTF-8')
     sections = config.sections()
     if the_city in sections:
         the_config = dict(config.items(the_city))
     else:
         the_config = dict(config['DEFAULT'])
-    global total
+    
     total = 0
     for key, value in the_config.items():
         if key == "JiShuL".lower():
-            global min
-            min = float(value)
+            
+            lowest = float(value)
         elif key == "JiShuH".lower():
-            global max
-            max = float(value)
+            
+            highest = float(value)
         else:
             total += float(value)
 
