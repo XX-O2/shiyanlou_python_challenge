@@ -1,0 +1,4 @@
+{% for title in titles %}
+    <span> {{ title }} </span>
+    <br></br>
+{% endfor %}
