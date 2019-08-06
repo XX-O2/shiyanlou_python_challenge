@@ -1,4 +1,4 @@
-{% for title,id in zip(titles,ids) %}
-	<a href=url_for('file',file_id=id)</p>
-    <br></br>
+{% for f in files %}
+	<a href="{{ url_for('route',file_id=f.id) }}">{{ f.title }}</a>
+	<br></br>
 {% endfor %}

@@ -1,0 +1,3 @@
+<p> title: {{datas[title]}} </p>
+<p> created_time: {{datas[created_time]}} </p>
+<p> content: {{datas[content]}} </p>

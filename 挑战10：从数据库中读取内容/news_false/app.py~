@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/study'
 db = SQLAlchemy(app)
 
@@ -20,41 +19,37 @@ class File(db.Model):
 	category = db.relationship('Category',uselist=False)
 	content = db.Column(db.Text)
 
-	def __init__(self,title,created_time,category,content):
-		self.title = title
-		self.created_time = created_time
-		self.category = category
-		self.content = content
-
+	def __repr__(self):
+		return "<User %r>" % self.title
 
 class Category(db.Model):
 
 	__tablename__ = 'category'
 
-	id = db.Column(db.Integer,primary_key=True)
+	id = db.Column(db.Integer,primary_key=True,)
 	name = db.Column(db.String(80))
 	file = db.relationship('File')
 
-	def __init__(self,name):
-		self.name = name
+	def __repr__(self):
+		return "<User %r>"% self.name	
 
 @app.route('/')
 def index():
 	# 显示文章名称的列表
 	# 页面中需要显示所有文章的标题（title）列表，此外每个标题都需要使用 '<a href=></a>'链接到对应的文章内容页面
-	#titles = []
-	#ids = []
-	#for f in db.session.query(File).all():
-		#titles.append(f.title)
-		#ids.append(f.id)
-	return render_template('index.html',files=db.session.query(File).all())
+	titles = []
+	ids = []
+	for f in session.query(File).all():
+		titles.append(f.title)
+		ids.append(f.id)
+	return render_template('index.html',titles=titles,ids=ids)
 
-@app.route('/files/<int:file_id>')
-def file(file_id):
+@app.route('/files/<file_id>')
+def file(filename):
 	# file_id 为 File 表中的文章 ID
 	try:
-		f=db.session.query(File).filter(File.id==file_id).first()
-		return render_template('file.html',f=f)
+		f=session.query(File).filter(File.id==file_id).first()
+		return render_template('file.html',datas=f)
 	except:
 		abort(404)
     # 读取并显示 filename.json 中的文章内容
