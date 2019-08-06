@@ -24,7 +24,7 @@ def file(filename):
     try:
         with open(the_file_path,"r") as f:
             datas = json.load(f)
-        return render_template('file.html',datas=datas)
+	return render_template('file.html',datas=datas)
     except:
         abort(404)
     # 读取并显示 filename.json 中的文章内容

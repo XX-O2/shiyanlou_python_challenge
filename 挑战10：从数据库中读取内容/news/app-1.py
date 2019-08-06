@@ -7,14 +7,17 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     files_path ="/home/shiyanlou/files/"
-    files_list = os.listdir(files_path) 
+    files_list = os.listdir(files_path)
     titles = []
     for the_file in files_list:
         file_name = os.path.join(files_path,the_file)
         with open(file_name,'r') as f :
             data = json.load(f)
-            titles.append(data['title']) 
-    return render_template('index.html',titles=titles)
+            titles.append(data['title'])
+    names = ""    
+    for title in titles:
+        names = names + "   " +title
+    return names
     # 显示文章名称的列表
     # 也就是 /home/shiyanlou/files/ 目录下所有json文件中的 title 信息列表
 
@@ -24,7 +27,10 @@ def file(filename):
     try:
         with open(the_file_path,"r") as f:
             datas = json.load(f)
-        return render_template('file.html',datas=datas)
+            contents=""
+            for key,value in datas.items():
+                contents = contents + key + ":"+value + "\n"
+        return contents
     except:
         abort(404)
     # 读取并显示 filename.json 中的文章内容
