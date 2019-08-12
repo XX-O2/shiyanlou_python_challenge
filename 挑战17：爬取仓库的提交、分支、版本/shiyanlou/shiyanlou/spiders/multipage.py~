@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+import scrapy
+from shiyanlou.items import MultipageCourseItem
+
+class MultipageSpider(scrapy.Spider):
+    name = 'multipage'
+    
+    @property
+    def start_urls(self):
+        url_list = ['https://github.com/shiyanlou?tab=repositories',
+        'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNy0wNi0wN1QwODowNjo1MyswODowMM4FkpKN&tab=repositories',
+        'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNS0wMS0zMVQyMDoyMDowMiswODowMM4BzHi1&tab=repositories',
+        'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNC0xMi0wNFQwMDoxNzo1MyswODowMM4BpCnu&tab=repositories',
+        'https://github.com/shiyanlou?after=Y3Vyc29yOnYyOpK5MjAxNC0wOS0xNlQxMDowNjowMyswODowMM4Bb3Ud&tab=repositories']
+        return url_list
+
+    def parse(self, response):
+        for course in response.css('div.col-10'):
+            item = MultipageCourseItem(
+                name = course.css('h3 a::text').extract_first().split(),
+                update_time = course.css('relative-time::attr(datetime)').extract_first().split()
+)
+            #course_url = str(course.css('a.name.codeRepository::attr(href)').extract_first())
+            full_course_url = response.urljoin(course.xpath('.//a/@href').extract_first())
+            request = scrapy.Request(full_course_url,callback=self.parse_details)
+            request.meta['item'] = item
+            yield request
+
+    def parse_details(self,response):
+        item = response.meta['item']
+        item['commits'] = response.css('span.num.text-emphasized::text]').extract()[0].strip()
+        item['branches'] = response.css('span.num.text-emphasized::text]').extract()[1].strip()
+        item['releases'] = response.css('span.num.text-emphasized::text]').extract()[2].strip()
+        yield item
